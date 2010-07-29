@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
+  <meta>
+    <sampleQuery>select * from count where url="http://www.korea-dpr.com/" and tag="strong"</sampleQuery>
+    <author>Christian Heilmann</author>
+    <documentationURL>http://isithackday.com/hackday-toolbox/yql-open-table-with-js</documentationURL>  
+    <description>Counts to amount of times a certain tag is in an HTML document.</description>
+  </meta>
+  <bindings>
+    <select itemPath="" produces="XML">
+      <inputs>
+        <key id='url' type='xs:string' paramType='variable' required="true" />
+        <key id='tag' type='xs:string' paramType='variable' required="true" />
+      </inputs>
+      <execute><![CDATA[
+        var data = y.rest(url).get().response;
+        var match = new RegExp('<'+tag+'[>|\s]');
+        var count = data.split(match);
+        var number = parseInt(count.length-1);
+        response.object = <counted>
+                            <url>{url}</url>
+                            <tag>{tag}</tag>
+                            <count>{number}</count>
+                          </counted>;
+      ]]></execute>
+    </select>
+  </bindings>
+</table>

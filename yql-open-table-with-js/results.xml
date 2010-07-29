@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query xmlns:yahoo="http://www.yahooapis.com/v1/base.rng" yahoo:count="1" yahoo:created="2010-07-29T11:58:03Z" yahoo:lang="en-US">
+  <diagnostics>
+    <publiclyCallable>true</publiclyCallable>
+    <url execution-time="3" proxy="DEFAULT"><![CDATA[http://isithackday.com/hackday-toolbox/yql-open-table-with-js/count-tags.xml]]></url>
+    <url execution-time="244" proxy="DEFAULT"><![CDATA[http://www.korea-dpr.com/]]></url>
+    <javascript execution-time="306" instructions-used="3095" table-name="count"></javascript>
+    <user-time>313</user-time>
+    <service-time>247</service-time>
+    <build-version>8771</build-version>
+  </diagnostics>
+  <results>
+    <counted>
+      <url>http://www.korea-dpr.com/</url>
+      <tag>strong</tag>
+      <count>904</count>
+    </counted>
+  </results>
+</query>

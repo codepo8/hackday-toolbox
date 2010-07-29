@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>Demo of showing Flickr photos using YQL and YUI3</title>
+  <link rel="stylesheet" type="text/css" href="../yui.css">
+  <link rel="stylesheet" href="../styles.css" type="text/css">
+  <script type="text/javascript" src="http://yui.yahooapis.com/combo?3.2.0pr1/build/yui/yui-min.js"></script>   
+  <style type="text/css">
+    #flickr{
+      margin:1em 0;padding:0;overflow:hidden;list-style:none;
+    }
+    #flickr li{
+      float:left;padding:5px;background:#eee;
+      border:1px solid #999;margin-right:5px;
+      list-style:none;
+    }
+    ul li img{display:block;}
+  </style>
+</head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+  <div id="hd" role="banner">
+    <h1>Demo of showing Flickr photos using YQL and YUI3</h1>
+    <p><a href="../index.html">Back to index</a></p>
+  </div>
+  <div id="bd" role="main">
+    <h2>Photos of elephants:</h2>
+    <ul id="flickr"></ul>
+  </div>
+  <div id="ft" role="contentinfo">
+    <p>Part of the Hackday Toolbox</p>
+  </div>
+</div>
+<script>
+  YUI().use('node','substitute','yql', function(Y){
+  var url='<li><a href="http://flickr.com/photos/{OWNER}/{ID}">'+
+          '<img src="http://static.flickr.com/{SERVER}/{ID}'+
+          '_{SECRET}_s.jpg"></a></li>';
+  var container = Y.one('#flickr');
+  new Y.YQL('select * from flickr.photos.search where text="elephant"',     
+    function(r){
+        if(r.error){
+          container.set('innerHTML','<p class="error">'+
+                                     r.error.description+'</p>');
+        } else {
+          Y.each(r.query.results.photo,function(v){
+            var img = Y.substitute(url,{
+                ID: v.id,
+                OWNER: v.owner,
+                SERVER: v.server,
+                SECRET: v.secret
+            });
+              container.append(img);
+          });
+        }
+    });
+  });
+</script>
+</body>
+</html>

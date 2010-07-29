@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>Demo of showing a form to query YQL data with JavaScript</title>
+  <link rel="stylesheet" type="text/css" href="../yui.css">
+  <link rel="stylesheet" href="../styles.css" type="text/css">
+</head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+  <div id="hd" role="banner">
+    <h1>Demo of showing a form to query YQL data with JavaScript</h1>
+    <p><a href="../index.html">Back to index</a></p>
+  </div>
+  <div id="bd" role="main">
+    <form action="http://search.yahoo.com/search">
+      <div>
+        <label for="p">Search:</label>
+        <input type="text" id="p" name="p"></input>
+        <input type="submit" value="make it so"></input>
+      </div>
+    </form>
+    <!-- 
+      notice the progressive enhancement - when there is no JS, we just
+      send the user to the Yahoo search result page - that's why I chose
+      p as the name of the search box.
+     -->
+  </div>
+  <div id="ft" role="contentinfo">
+    <p>Part of the Hackday Toolbox</p>
+  </div>
+</div>
+<script>
+  function query(term){
+    var query = 'select * from search.web where query="'+
+                 encodeURIComponent(term)+'"';
+
+    // start the URL by defining the API endpoint and encoding the query
+    var apiendpoint = 'http://query.yahooapis.com/v1/public/yql?q=';
+    var url = apiendpoint + encodeURIComponent(query);
+
+    // diagnostics - remove if you don't need them
+    url += '&diagnostics=true';
+
+    // format (json or xml)
+    url += '&format=json'; 
+
+    // callback function (when format is json this triggers JSON-P-X output)
+    url += '&callback=incoming'; 
+
+    // environment. this gives you access to the community tables
+    url += '&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
+
+    var s = document.createElement('script');
+    s.setAttribute('src',url);
+    document.getElementsByTagName('head')[0].appendChild(s);
+  }
+  function incoming(o){
+    if(o.query && o.query.results && o.query.results.result){
+      var res = o.query.results.result,
+          out = '<ol>',
+          i = 0,
+          cur = '';
+      for(i=0,j=res.length;i<j;i++){
+        cur = res[i];
+        out += '<li><h3><a href="'+cur.clickurl+'">'+cur.title+'</a></h3>'+
+             '<p>'+cur.abstract+' ('+cur.dispurl+')</p></li>';
+      }
+      out += '</ol>';
+      output.innerHTML = out;
+    } else {
+      output.innerHTML = '<p class="error">Could not retrieve data...</p>';
+    }
+  };
+  var output = document.createElement('div');
+  output.setAttribute('id','yqldata');
+  document.getElementById('bd').appendChild(output);
+  
+  var f = document.getElementsByTagName('form')[0];
+  f.onsubmit = function(){
+    output.innerHTML = 'Loading&hellip;';
+    query(document.getElementById('p').value);
+    return false;
+  };
+</script>
+</body>
+</html>

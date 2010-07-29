@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>Demo of showing Flickr photos using YQL and flickr.photolist</title>
+  <link rel="stylesheet" type="text/css" href="../yui.css">
+  <link rel="stylesheet" href="../styles.css" type="text/css">
+  <style type="text/css">
+    #flickr ul,#flickrlocation ul{
+      margin:1em 0;padding:0;overflow:hidden;list-style:none;
+    }
+    #flickr ul li,#flickrlocation ul li{
+      float:left;padding:5px;background:#eee;
+      border:1px solid #999;margin-right:5px;
+      list-style:none;
+    }
+    ul li img{display:block;}
+  </style>
+</head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+  <div id="hd" role="banner">
+    <h1>Demo of showing Flickr photos using YQL and <code>flickr.photolist</code></h1>
+    <p><a href="../index.html">Back to index</a></p>
+  </div>
+  <div id="bd" role="main">
+    <h2>Photos of cats:</h2>
+    <div id="flickr"></div>
+    <h2>Photos of puppies:</h2>
+    <div id="flickrlocation"></div>
+  </div>
+  <div id="ft" role="contentinfo">
+    <p>Part of the Hackday Toolbox</p>
+  </div>
+</div>
+<script>
+  function flickr(o){
+    document.getElementById('flickr').innerHTML = o.results;
+  }
+  function flickrpup(o){
+    document.getElementById('flickrlocation').innerHTML = o.results;
+  }
+</script>
+<!-- 
+  The following script source where copied from YQL 
+  notice format=xml and callback=functionname to 
+  trigger JSON-P-X output.
+-->
+<script src="http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20flickr.photolist%20where%20text%3D%22cat%22%20and%20amount%3D5&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&output=xml&callback=flickr"></script>
+<script src="http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20flickr.photolist%20where%20text%3D%22puppies%22%20and%20amount%3D5&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&output=xml&callback=flickrpup"></script>
+</body>
+</html>

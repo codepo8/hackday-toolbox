@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>Demo of showing Geoplanet information on a Yahoo map</title>
+  <link rel="stylesheet" type="text/css" href="../yui.css">
+  <link rel="stylesheet" href="../styles.css" type="text/css">
+  <script type="text/javascript" src="http://yui.yahooapis.com/combo?3.2.0pr1/build/yui/yui-min.js"></script> 
+  <style type="text/css" media="screen">
+    #map{width:100%;height:400px;}
+    form{margin:0;padding:.5em;background:#666;color:#fff;}
+    /* fix to use maps with YUI CSS, I know it is terrible */
+    #map table,#map td,#map th{margin:0;padding:0;border:none;}
+  </style>  
+</head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+  <div id="hd" role="banner">
+    <h1>Demo of showing Geoplanet information on a Yahoo map</h1>
+    <p><a href="../index.html">Back to index</a></p>
+  </div>
+  <div id="bd" role="main">
+    <form id="f"><div>
+      <label for="location">Show map for</label>
+      <input type="text" id="location" name="location">
+      <input type="submit" value="go there">
+    </div></form>
+    <div id="map"></div>
+  </div>
+  <div id="ft" role="contentinfo">
+    <p>Part of the Hackday Toolbox</p>
+  </div>
+</div>
+<!-- 
+  replace the appid with your own if you use this demo, please 
+  you can get yours at http://developer.yahoo.com/maps/
+-->
+<script src="http://api.maps.yahoo.com/ajaxymap?v=3.8&appid=SckyCn7V34EmWovT9sK7Z2ivzd2NtNKOMzTWVFwViDtkNLvxNKbiLqqWN9nqtdg-'"></script>
+<script>
+YUI().use('yql','node',function(Y){
+  var container = Y.one('#map');
+  Y.one('#f').on('submit',function(e){
+    e.preventDefault();
+    findlocation(Y.one('#location').get('value'));
+  });
+  /* 
+    Find a location with YQL and geo.places.
+  */
+  function findlocation(location){
+    new Y.YQL('select * from geo.places where text="'+location+'"',     
+      function(r){
+        if(r.error){
+          container.set('innerHTML','<p class="error">'+
+                                     r.error.description+'</p>');
+        } else {
+          // send the information of the center and the bounding box to 
+          // rendermap - without the bounding box the zoom level would
+          // be way off
+          var cur = r.query.results.place[0] ? 
+                    r.query.results.place[0] : 
+                    r.query.results.place;
+          if(cur){
+            rendermap(
+              location,'map',[
+                cur.centroid.latitude,
+                cur.centroid.longitude,
+                cur.boundingBox.northEast.latitude,
+                cur.boundingBox.northEast.longitude,
+                cur.boundingBox.southWest.latitude,
+                cur.boundingBox.southWest.longitude
+              ]
+            );
+          }
+        }
+    });
+  };
+  findlocation('San Francisco');
+  /*
+    Reusable function to use the Yahoo maps Ajax API.
+    checks if there is only a center point or also boundaries
+  */
+  function rendermap(title,elementid,points){
+   var x = points;
+   if(x[0]){
+     var map = new YMap(document.getElementById(elementid));
+     map.addTypeControl();
+     map.addZoomLong();
+     map.addPanControl();
+     map.disableKeyControls();
+     map.setMapType(YAHOO_MAP_HYB);
+     var points = [];
+     var point = new YGeoPoint(x[0],x[1]);
+     points.push(point);
+     var newMarker = new YMarker(point);
+     newMarker.addAutoExpand(title);  
+     map.addOverlay(newMarker);
+   }
+   if(x[2] && x[3]){
+     point = new YGeoPoint(x[2],x[3]);
+     points.push(point);
+   }
+   if(x[4] && x[5]){
+     point = new YGeoPoint(x[4],x[5]);
+     points.push(point);
+   }
+   var zac = map.getBestZoomAndCenter(points);
+   var level = points.length > 1 ? zac.zoomLevel : zac.zoomLevel + 1;
+   map.drawZoomAndCenter(zac.YGeoPoint,level);
+   map.drawZoomAndCenter(points[0],level);
+  };
+});
+</script>
+</body>
+</html>

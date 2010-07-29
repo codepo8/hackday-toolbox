@@ -1,0 +1,608 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+  <title>Using PHP for hacks</title>
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0/build/reset-fonts-grids/reset-fonts-grids.css&2.8.0/build/base/base-min.css">
+  <link rel="stylesheet" href="../styles.css" type="text/css">
+  <style type="text/css" media="screen">
+    body{font-family:verdana,sans-serif;width:700px;margin:10px auto;}
+    p img{display:block;margin:10px 0;}
+  </style>
+</head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+
+  <div id="hd" role="banner">
+    <h1>Using PHP for hacks</h1>
+    <p><a href="../index.html">Back to index</a></p>
+  </div>
+  <div id="bd" role="main">
+
+
+
+<p>In this article I want to introduce you to the basics of PHP. We'll concentrate specifically on PHP to access web services and turn static HTML pages into dynamic ones by retrieving data from the web and by showing different content dependent on what users entered in forms or requested in the URL. You won't come out at the end of this article as a professional PHP developer but it'll get you well on the way of building a small page that uses web services. You can find a lot of great PHP info out on the web and most of the time you will end up on the <a href="http://php.net">PHP.net</a> site itself. I was however asked repeatedly on several hack days and competitions to write this quick introduction article - so here it is. </p>
+
+<h2>What is PHP?</h2>
+
+PHP is a server-side language that has become a massive success because of three reasons: 
+<ul>
+<li>It is a very easy, forgiving language - variables can be anything and you can create them any time you want to.</li>
+<li>it is part of the free LAMP stack (Linux, Apache, MySQL, PHP) and thus available on almost any server you can rent on the web.</li>
+<li>it does not need any special editor, environment or build process. All you do is create a file with the <code>.php</code> file type, mix PHP and HTML and put it on your server for displaying.</li>
+</ul>
+
+<h2>Installing PHP locally and your first code</h2>
+
+<p>To run PHP locally on your computer you need a local server with PHP enabled. The easiest way is to download and install <a href="">MAMP for OSX</a> or <a href="">XAMPP for Windows</a>. Once you have any of these packages installed you can start using PHP. Simply create a file called <code>index.php</code> in the <code>htdocs</code> folder of your MAMP or XAMPP install. </p>
+
+<p>In this file, type (or actually copy + paste) the following:</p>
+
+<pre><code>&lt;?php
+  $myname = &#x27;Chris&#x27;;
+  echo &#x27;&lt;p&gt;This is PHP&lt;/p&gt;&#x27;;
+  echo &quot;&lt;p&gt;My name is $myname&lt;/p&gt;&quot;
+  echo &#x27;&lt;p&gt;My name in another notation is still  &#x27;.$myname.&#x27;&lt;/p&gt;&#x27;;
+?&gt;</code></pre>
+
+<p>If you open this file in a browser by accessing your XAMPP or MAMP install (via http://localhost/index.php or http://localhost:8888/index.php) you should get the following:</p>
+
+<pre><code>This is PHP
+My name is Chris
+My name in another notation is still Chris</code></pre>
+
+<p>However, you won't. The problem is that the third line does not end in a semicolon ";". This is an error. Depending on what PHP installation you have you either get an error message or simply nothing. If you got nothing, find the file called <code>php_error.log</code> on your hard drive and open it - it will tell you what went wrong <img src="phperrorlog.png" alt="The PHP error log as shown on a Mac">. So, the first thing to remember is that every line of PHP needs to end in a semicolon. If we fix this problem <a href="http://icant.co.uk/articles/phpforhacks/index.php">we get the result</a>:<img src="php-rendered.png" alt="PHP rendered in a browser"></p>
+
+<pre><code>&lt;?php
+  $myname = &#x27;Chris&#x27;;
+  echo &#x27;&lt;p&gt;This is PHP&lt;/p&gt;&#x27;;
+  echo &quot;&lt;p&gt;My name is $myname&lt;/p&gt;&quot;;
+  echo &#x27;&lt;p&gt;My name in another notation is still  &#x27;.$myname.&#x27;&lt;/p&gt;&#x27;;
+?&gt;</code></pre>
+
+
+
+<p>You can see the first few features of PHP that are important:</p>
+
+<ul>
+<li>PHP blocks start with <code>&lt?php</code> and end with <code>?&gt;</code> - anything within these two commands will be interpreted as PHP and returned to the document as HTML.</li>
+<li>Every line of PHP has to end with a semicolon ";" - otherwise it is an error.</li>
+<li>Variables in PHP start with a $ - not with the var keyword like you'd do it in JavaScript (this is where it gets confusing with jQuery and Prototype)</li>
+<li>You print out content to the document in PHP with the <code>echo</code> command. There is also a <code>print</code> command which does almost the same so you can use that, too.</li>
+<li>In this example we define a string called <code>myname</code> as "Chris". To print it out with the echo command surrounded by other text you need to either embed the variable name in a text with quotation marks or to concatenate the string with a full stop when you use single quotation marks. This is line 3 and 4 - they do the same but show the different syntax. Concatenation is always achieved with the full stop - never with a + as you do in JavaScript.</li>
+</ul>
+
+<p>You can jump in and out of PHP anywhere in the document. So if you intersperse PHP with HTML blocks, that is totally fine. For example:</p>
+
+<pre><code>&lt;?php
+  $origin = &#x27;Outer Space&#x27;;
+  $planet = &#x27;Earth&#x27;;
+  $plan = 9;
+  $sceneryType = &quot;awful&quot;;
+?&gt;
+&lt;h1&gt;Synopsis&lt;/h1&gt;
+
+&lt;p&gt;It was a peaceful time on planet &lt;?php echo $planet;?&gt; 
+and people in the &lt;?php echo $sceneryType;?&gt; scenery were unaware 
+of the diabolic plan &lt;?php echo $plan;?&gt; from &lt;?php echo $origin;?&gt; 
+that will take their senses to the edge of what can be endured.&lt;/p&gt;</code></pre>
+
+<p>This <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=1">has the following output</a>: <img src="variables-rendered.png" alt="Rendered variables in PHP"></p>
+
+<p>Are you with me so far? If you want to show something on the screen, you use echo - if it is numbers or a string. If you need to show more complex structures, you need loops or specialized debugging methods.</p>
+
+<h2>Displaying more complex data types</h2>
+
+<p>You can define arrays in PHP using the <code>array()</code> method:</p>
+
+<pre><code>$lampstack = array('Linux','Apache','MySQL','PHP');</code></pre>
+
+<p>If you simply want to display a complex datatype like this in PHP for debugging you can use the <code>print_r()</code> command:</p>
+
+<pre><code>$lampstack = array('Linux','Apache','MySQL','PHP');
+print_r($lampstack);</code></pre>
+
+<p><a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=2">This gives you all the information</a> but it doesn't help you structuring it as HTML: <img src="print_r-demo.png" alt="Displaying arrays with print_r"> For this, you need to access the elements with the array counter. In PHP this is done with the <code>[]</code> brackets:</p>
+
+<pre><code>&lt;ul&gt;
+&lt;?php
+$lampstack = array(&#x27;Linux&#x27;,&#x27;Apache&#x27;,&#x27;MySQL&#x27;,&#x27;PHP&#x27;);
+echo &#x27;&lt;li&gt;Operating System:&#x27;.$lampstack[0] . &#x27;&lt;/li&gt;&#x27;;
+echo &#x27;&lt;li&gt;Server:&#x27; . $lampstack[1] . &#x27;&lt;/li&gt;&#x27;;
+echo &#x27;&lt;li&gt;Database:&#x27; . $lampstack[2] . &#x27;&lt;/li&gt;&#x27;;
+echo &#x27;&lt;li&gt;Language:&#x27; . $lampstack[3] . &#x27;&lt;/li&gt;&#x27;;
+?&gt;
+&lt;/ul&gt;</code></pre>
+<p>See this <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=3">demo in action</a>.</p>
+
+<p>This of course is stupid programming as it is not flexible. If you get the chance to make a computer do your dirty work for you, make it do it. In this case, <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=4">we could define two arrays and use a loop</a>:</p>
+
+<pre><code>&lt;ul&gt;
+&lt;?php
+$lampstack = array(&#x27;Linux&#x27;,&#x27;Apache&#x27;,&#x27;MySQL&#x27;,&#x27;PHP&#x27;);
+$labels = array(&#x27;Operating System&#x27;,&#x27;Server&#x27;,&#x27;Database&#x27;,&#x27;Language&#x27;);
+$length = sizeof($lampstack);
+for( $i = 0;$i &lt; $length;$i++ ){
+  echo &#x27;&lt;li&gt;&#x27; . $labels[$i] . &#x27;:&#x27; . $lampstack[$i] . &#x27;&lt;/li&gt;&#x27;;
+}
+?&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>The for loop works the same way as it does in JavaScript - the only difference is that you read the size of an array not with <code>array.length</code> but with <code>sizeof($array)</code> instead.</p>
+
+<p>Again, this example is not really clever, as it assumes that both the <code>$lampstack</code> and the <code>$labels</code> array are the same length and in the same order. Instead of using this, <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=5">I'd use an associated array</a>:</p>
+
+<pre><code>&lt;ul&gt;
+&lt;?php
+$lampstack = array(
+  &#x27;Operating System&#x27; =&gt; &#x27;Linux&#x27;,
+  &#x27;Server&#x27; =&gt; &#x27;Apache&#x27;,
+  &#x27;Database&#x27; =&gt; &#x27;MySQL&#x27;,
+  &#x27;Language&#x27; =&gt; &#x27;PHP&#x27;
+);
+$length = sizeof($lampstack);
+$keys = array_keys($lampstack);
+for( $i = 0;$i &lt; $length;$i++ ){
+  echo &#x27;&lt;li&gt;&#x27; . $keys[$i] . &#x27;:&#x27; . $lampstack[$keys[$i]] . &#x27;&lt;/li&gt;&#x27;;
+}
+?&gt;
+&lt;/ul&gt;
+</code></pre>
+
+<p>The function <code>array_keys()</code> gives you back all the keys of an array as an array itself. This way we can display the keys and the values at the same time.</p>
+
+<p>A shorter way of achieving the same principle which works both with arrays and with objects is <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=6">using the <code>foreach()</code> loop construct</a>:</p>
+
+<pre><code>&lt;ul&gt;
+&lt;?php
+$lampstack = array(
+  &#x27;Operating System&#x27; =&gt; &#x27;Linux&#x27;,
+  &#x27;Server&#x27; =&gt; &#x27;Apache&#x27;,
+  &#x27;Database&#x27; =&gt; &#x27;MySQL&#x27;,
+  &#x27;Language&#x27; =&gt; &#x27;PHP&#x27;
+);
+foreach( $lampstack as $key =&gt; $stackelm ){
+  echo &#x27;&lt;li&gt;&#x27; . $key . &#x27;:&#x27; . $stackelm . &#x27;&lt;/li&gt;&#x27;;
+}
+?&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>This is the shortest way of displaying a complex construct - it will however also fail when <code>$lampstack</code> is not an array. So checking for <code>sizeof()</code> is still a good plan. You do this with a conditional.</p>
+
+<h2>Using conditionals</h2>
+
+<p>Conditionals are if statements - both in the English language and in almost any programming language I know. So for example to test if an array is safe to loop over <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=7">you use the <code>sizeof()</code> test</a>:</p>
+
+<pre><code>&lt;ul&gt;
+&lt;?php
+$lampstack = array(
+  &#x27;Operating System&#x27; =&gt; &#x27;Linux&#x27;,
+  &#x27;Server&#x27; =&gt; &#x27;Apache&#x27;,
+  &#x27;Database&#x27; =&gt; &#x27;MySQL&#x27;,
+  &#x27;Language&#x27; =&gt; &#x27;PHP&#x27;
+);
+if( sizeof($lampstack) &gt; 0 ){
+  foreach( $lampstack as $key =&gt; $stackelm ){
+    echo &#x27;&lt;li&gt;&#x27; . $key . &#x27;:&#x27; . $stackelm . &#x27;&lt;/li&gt;&#x27;;
+  }
+}
+?&gt;
+&lt;/ul&gt;</code></pre>
+
+<p>Common conditionals are: </p>
+
+<ul>
+<li><code>if($x > 10 and $x < 20)</code> - is <code>$x</code> larger than 10 and less than 20?</li>
+<li><code>if(isset($name))</code> - has the variable <code>$name</code> been defined?</li>
+<li><code>if($name == 'Chris')</code> - does the variable <code>$name</code> have the value Chris?</li>
+<li><code>if($name == 'Chris' or $name == 'Vitaly')</code> - does the variable <code>$name</code> have the value Chris or the value Vitaly?</li>
+</ul>
+
+<p>Cool, but what if you want to make that reusable?</p>
+
+<h2>Functions in PHP</h2>
+
+<p>In order to make a task even more generic, you can write a function. In this case we put <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=8">the loop and the testing in a function and simply call it with different arrays</a>:</p>
+
+<pre><code>&lt;?php
+function renderList($array){
+  if( sizeof($array) &gt; 0 ){
+    echo &#x27;&lt;ul&gt;&#x27;;
+    foreach( $array as $key =&gt; $item ){
+      echo &#x27;&lt;li&gt;&#x27; . $key . &#x27;:&#x27; . $item . &#x27;&lt;/li&gt;&#x27;;
+    }
+    echo &#x27;&lt;/ul&gt;&#x27;;
+  }
+}
+$lampstack = array(
+  &#x27;Operating System&#x27; =&gt; &#x27;Linux&#x27;,
+  &#x27;Server&#x27; =&gt; &#x27;Apache&#x27;,
+  &#x27;Database&#x27; =&gt; &#x27;MySQL&#x27;,
+  &#x27;Language&#x27; =&gt; &#x27;PHP&#x27;
+);
+renderList($lampstack);
+
+$awfulacting = array(
+  &#x27;Natalie Portman&#x27; =&gt; &#x27;Star Wars&#x27;,
+  &#x27;Arnold Schwarzenegger&#x27; =&gt; &#x27;Batman and Robin&#x27;,
+  &#x27;Keanu Reaves&#x27; =&gt; &#x27;*&#x27;
+);
+renderList($awfulacting);
+?&gt;</code></pre>
+
+<p>Notice that functions do not start with a dollar sign.</p> 
+
+<p>That is already most of the magic of PHP. The rest is all about functions that are build for you to do all kind of things: convert strings, sort arrays, find things in other things, access the file system, set cookies and many more functions - all of which doing one thing and one thing right. I keep catching myself writing complex functions in PHP just to realize looking at the docs that there is a native function for that.</p>
+
+<h2>Interacting with the web - URL parameters</h2>
+
+<p>Let's start playing with the web in PHP - or, better said - information that comes from the browser address bar or forms for you to re-use. In order to get parameters from the current URL you use the global <code>$_GET</code> array. So, if you call the index.php script with <code>http://localhost/index.php?language=fr&font=large</code> you can change the display and locale by checking for these settings. The <code>language</code> parameter will be available as <code>$_GET['language']</code> and the <code>font</code> parameter as <code> $_GET['font']</code>:
+
+<pre><code>&lt;?php
+$name = &#x27;Chris&#x27;;
+
+// if there is no language defined, switch to English
+if( !isset($_GET[&#x27;language&#x27;]) ){
+  $welcome = &#x27;Oh, hello there, &#x27;;
+}
+if( $_GET[&#x27;language&#x27;] == &#x27;fr&#x27; ){
+  $welcome = &#x27;Salut, &#x27;;
+}
+switch($_GET[&#x27;font&#x27;]){
+  case &#x27;small&#x27;:
+    $size = 80;
+  break;
+  case &#x27;medium&#x27;:
+    $size = 100;
+  break;
+  case &#x27;large&#x27;:
+    $size = 120;
+  break;
+  default:
+    $size = 100;
+  break;
+}
+echo &#x27;&lt;style&gt;body{font-size:&#x27; . $size . &#x27;%;}&lt;/style&gt;&#x27;;
+echo &#x27;&lt;h1&gt;&#x27;.$welcome.$name.&#x27;&lt;/h1&gt;&#x27;;
+?&gt;</code></pre>
+
+<p>This means now that you can send URL parameters to change the behaviour of this document:<img src="parameters.png" alt="changing the content and look of a document with parameters"></p>
+
+<ul>
+  <li><a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=9">http://localhost:8888/index.php</a></li>
+  <li><a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=9&language=fr">http://localhost:8888/index.php?language=fr</a></li>
+  <li><a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=9&language=fr&font=large">http://localhost:8888/index.php?language=fr&font=large</a></li>
+</ul>
+
+<p>Notice that it is always the best to predefine a set of values that are acceptable for a certain parameter. The earlier example might as well have the font size in pixels as a parameter and we write that to the document but that means that we need to write a good validation script to prevent end users from sending bad values or even malicious code through the parameter.</p>
+<p>Sending malicious code via a parameter without filtering is called <a href="http://www.owasp.org/index.php/Cross-site_Scripting_%28XSS%29">Cross Site Scripting or XSS</a> and is one of the big security problems of the web. You can prevent against it by not printing out the values of parameters but instead using them in comparisons and by using the <a href="http://uk.php.net/manual/en/intro.filter.php">filters provided by PHP</a>.</p>
+
+<p>Say for example you want to allow users to enter some data with a form that you will display later on. Make sure that you filter out the results:</p>
+
+<pre><code>&lt;?php
+  $search_html = filter_input(INPUT_GET, &#x27;s&#x27;,
+                              FILTER_SANITIZE_SPECIAL_CHARS);
+  $search_url = filter_input(INPUT_GET, &#x27;s&#x27;,
+                             FILTER_SANITIZE_ENCODED);
+?&gt;
+&lt;form action=&quot;index.php&quot; method=&quot;get&quot;&gt;
+  &lt;div&gt;
+    &lt;label for=&quot;search&quot;&gt;Search:&lt;/label&gt;
+    &lt;input type=&quot;text&quot; name=&quot;s&quot; id=&quot;search&quot; 
+           value=&quot;&lt;?php echo $search_html;?&gt;&quot;&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;bar&quot;&gt;&lt;input type=&quot;submit&quot; value=&quot;Make it so&quot;&gt;&lt;/div&gt;
+&lt;/form&gt;
+&lt;?php
+if(isset($_GET['s'])){
+  echo &#x27;&lt;h2&gt;You searched for &#x27;.$search_html.&#x27;&lt;/h2&gt;&#x27;;
+  echo &#x27;&lt;p&gt;&lt;a href=&quot;index.php?search=&#x27;.$search_url.&#x27;&quot;&gt;Search again.&lt;/a&gt;&lt;/p&gt;&#x27;;
+}
+?&gt;</code></pre>
+
+<p>See the <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=10">filtering example in action</a>. Without the filters, attackers could send parameters like <code>index.php?s=&quot;&lt;script&gt;</code> which would execute third party code in your site. With filtering this malicious code gets converted to HTML entities.</p>
+
+<p>If you want to use POST as the method to send the data in your form the PHP variables change accordingly to <code>$_POST</code> for the array and <code>INPUT_POST</code> for the filter.</p>
+
+<h2>Loading content from the web</h2>
+
+<p>PHP comes with a lot of <a href="http://uk2.php.net/manual/en/ref.filesystem.php">file functions</a> that allow you to read and write files from the hard drive or load content from the web. I found however that for security reasons a lot of hosting companies disable them - especially when you try to read content from a third party resource. The workaround is to use cURL to load information from the web. cURL is a tool that allows you to make HTTP requests and get the information back from them - so to say a browser in command form. I've <a href="http://www.wait-till-i.com/2009/12/18/curl-your-view-source-of-the-web/">written a detailed post about cURL and how to use it</a>, so here's just the most simple use case for you:</p>
+
+<pre><code>&lt;?php
+  // define the URL to load
+  $url = &#x27;http://www.smashingmagazine.com&#x27;;
+  // start cURL
+  $ch = curl_init(); 
+  // tell cURL what the URL is
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  // tell cURL that you want the data back from that URL
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  // run cURL
+  $output = curl_exec($ch); 
+  // end the cURL call (this also cleans up memory so it is 
+  // important)
+  curl_close($ch);
+  // display the output
+  echo $output;
+?&gt;</code></pre>
+
+
+<p><a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=11">If you run this in a browser</a>, you see the Smashing Magazine homepage. <img src="smashingmagwithcurl.png" alt="Smashing Magazine homepage loaded with cURL"> You can however also take that data and strip out content:</p>
+
+<pre><code>&lt;?php
+  // define the URL to load
+  $url = &#x27;http://www.smashingmagazine.com&#x27;;
+  // start cURL
+  $ch = curl_init(); 
+  // tell cURL what the URL is
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  // tell cURL that you want the data back from that URL
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  // run cURL
+  $output = curl_exec($ch); 
+  // end the cURL call (this also cleans up memory so it is 
+  // important)
+  curl_close($ch);
+  // if a filter parameter with the value links was sent
+  if($_GET[&#x27;filter&#x27;] == &#x27;links&#x27;){
+    // get all the links from the document and show them
+    echo &#x27;&lt;ul&gt;&#x27;;
+    preg_match_all(&#x27;/&lt;a[^&gt;]+&gt;[^&lt;\/a&gt;]+&lt;\/a&gt;/msi&#x27;,$output,$links);
+    foreach($links[0] as $l){
+      echo &#x27;&lt;li&gt;&#x27; . $l . &#x27;&lt;/li&gt;&#x27;;      
+    }
+    echo&#x27;&lt;/ul&gt;&#x27;;
+  // otherwise just show the page
+  } else {
+    echo $output;
+  }
+?&gt;</code></pre>
+
+<p>If you open this in your browser you <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=12&filter=true">get all the links on smashing magazine</a> and none of the other content. <img src="links.png" alt="Smashing magazine links"> In nowaday's web development you are more likely to use APIs than loading web sites though, which is why you need a way to convert XML and JSON returned from a web service into PHP friendly data.</p>
+
+<h2>Displaying XML content</h2>
+
+<p>The easiest way to deal with XML content in PHP is to use the <a href="http://php.net/manual/en/book.simplexml.php">SimpleXML functions of PHP</a>. Using this we can turn a bunch of XML into a PHP object and loop over this. Say for example you want to <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=13">show the Smashing Magazine RSS feed</a> you can do the following:</p>
+
+<pre><code>&lt;?php
+  $url = &#x27;http://rss1.smashingmagazine.com/feed/&#x27;;
+  $ch = curl_init(); 
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  $output = curl_exec($ch); 
+  curl_close($ch);
+  $data = simplexml_load_string($output);
+  echo &#x27;&lt;ul&gt;&#x27;;
+  foreach($data-&gt;entry as $e){
+    echo &#x27;&lt;li&gt;&lt;a href=&quot;&#x27; . $e-&gt;link[0][&#x27;href&#x27;] . 
+         &#x27;&quot;&gt;&#x27;.$e-&gt;title.&#x27;&lt;/a&gt;&lt;/li&gt;&#x27;;
+  }
+  echo &#x27;&lt;/ul&gt;&#x27;;
+?&gt;</code></pre>
+
+<p>The <code>simplexml_load_string()</code> function takes the XML document and turns it into a PHP object with arrays. How did I find out to loop over <code>data->entry</code> and get the <code>href</code> via <code>link[0]['href']</code>? Simple. I did a <code>print_r($output)</code> and checked the source of the document with CMD+U in Firefox on my mac. That showed me that <code>entry</code> is an array. I then did a <code>print_r($e)</code> in the loop to see all the properties of every entry. If it is part of the <code>@attributes</code> array, you need to use the <code>[]</code> notation.</p>
+
+<p>That's all. The only stumbling block you will encounter are CDATA blocks and namespaces in SimpleXML. Stuart Herbert <a href="http://blog.stuartherbert.com/php/2007/01/07/using-simplexml-to-parse-rss-feeds/">has a good introduction to these two issues in this article</a>.</p> 
+
+<h2>Displaying JSON content</h2>
+
+<p>The data format <a href="http://json.org">JSON</a> is the low-fat alternative to XML. It is far less complex (no namespaces) and if you work in a JavaScript environment, it is native to the browser. This makes it very fast and easy to use and thus started to become a very much used data format for APIs. In essence, JSON is a JavaScript object. So for example I could write the LAMP stack example as:</p>
+<pre><code>{"lampstack":
+  {
+    "operatingsystem" : "Linux",
+    "server" : "Apache",
+    "database" : "MySQL",
+    "language" : "PHP"
+  }
+}</code></pre>
+
+<p>You can <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=14">convert this to PHP using the <code>json_decode()</code> method</a> and get it back as a PHP object:</p>
+
+<pre><code>&lt;?php
+  $json = &#x27;{
+  &quot;lampstack&quot;:
+  {
+    &quot;operatingsystem&quot;:&quot;Linux&quot;,
+    &quot;server&quot;:&quot;Apache&quot;,
+    &quot;database&quot;:&quot;MySQL&quot;,
+    &quot;language&quot;:&quot;PHP&quot;
+    }
+  }&#x27;;
+  print_r(json_decode($json));
+?&gt;</code></pre>
+
+<p>One API that returns JSON is the <a href="http://apiwiki.twitter.com/Twitter-Search-API-Method%3A-trends">Twitter trends API</a>. For example if you load this API's URL with cURL and do a <code>print_r()</code> after <code>json_decode()</code> you <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=15">get the following back</a>:</p>
+
+<pre><code>&lt;?php
+  $url = &#x27;http://search.twitter.com/trends.json&#x27;;
+  $ch = curl_init(); 
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  $output = curl_exec($ch); 
+  curl_close($ch);
+  $data = json_decode($output);
+  print_r($data);
+?&gt;</code></pre>
+
+<pre><code>stdClass Object
+(
+[trends] => Array
+  (
+    [0] => stdClass Object
+    (
+      [name] => #nowplaying
+      [url] => http://search.twitter.com/search?q=%23nowplaying
+    )
+
+    [1] => stdClass Object
+    (
+      [name] => #Didntwannatellyou
+      [url] => http://search.twitter.com/search?q=%23Didntwannatellyou
+    )
+
+    [2] => stdClass Object
+    (
+      [name] => #HappyBirthdayGagaBR
+      [url] => http://search.twitter.com/search?q=%23HappyBirthdayGagaBR
+    )
+
+    [3] => stdClass Object
+    (
+      [name] => Justin Bieber
+      [url] => http://search.twitter.com/search?q=%22Justin+Bieber%22
+    )
+
+    [4] => stdClass Object
+    (
+      [name] => #FreakyFactSays
+      [url] => http://search.twitter.com/search?q=%23FreakyFactSays
+    )
+
+    [5] => stdClass Object
+    (
+      [name] => #YouSoGangsta
+      [url] => http://search.twitter.com/search?q=%23YouSoGangsta
+    )
+
+    [6] => stdClass Object
+    (
+      [name] => I ♥
+      [url] => http://search.twitter.com/search?q=%22I+%E2%99%A5%22
+    )
+
+    [7] => stdClass Object
+    (
+      [name] => #MeMyselfandTime
+      [url] => http://search.twitter.com/search?q=%23MeMyselfandTime
+    )
+
+    [8] => stdClass Object
+    (
+      [name] => #2010yearofJonas
+      [url] => http://search.twitter.com/search?q=%232010yearofJonas
+    )
+
+    [9] => stdClass Object
+    (
+      [name] => Easter
+      [url] => http://search.twitter.com/search?q=Easter
+    )
+  )
+  [as_of] => Sun, 28 Mar 2010 19:31:30 +0000
+)
+</code></pre>
+
+<p>You can then use a simple loop to <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=16">render the current trends as an unordered list</a>:</p>
+
+<pre><code>&lt;?php
+  $url = &#x27;http://search.twitter.com/trends.json&#x27;;
+  $ch = curl_init(); 
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  $output = curl_exec($ch); 
+  curl_close($ch);
+  $data = json_decode($output);
+  echo &#x27;&lt;h2&gt;Twitter trending topics (&#x27;.$data-&gt;as_of.&#x27;)&lt;/h2&gt;&#x27;;
+  echo &#x27;&lt;ul&gt;&#x27;;
+  foreach ($data-&gt;trends as $t){
+    echo &#x27;&lt;li&gt;&lt;a href=&quot;&#x27;.$t-&gt;url.&#x27;&quot;&gt;&#x27;.$t-&gt;name.&#x27;&lt;/a&gt;&lt;/li&gt;&#x27;;
+  }
+  echo &#x27;&lt;/ul&gt;&#x27;;
+?&gt;</code></pre>
+
+<h2>Putting it all together</h2>
+
+<p>Let's do a quick example using all the things we learnt so far - a simple search interface for the web.</p>
+
+<p>Using <a href="http://developer.yahoo.com/yql/">Yahoo's YQL</a> it is pretty easy to do a web search for "cat" with the command <code>select * from search.web where query="cat"</code> sent to the YQL endpoint. You can define JSON as the return format and the rest means you simply <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=17">enhance the earlier form example</a>:</p>
+
+<pre><code>&lt;?php
+  $search_html = filter_input(INPUT_GET, &#x27;s&#x27;, FILTER_SANITIZE_SPECIAL_CHARS);
+  $search_url = filter_input(INPUT_GET, &#x27;s&#x27;, FILTER_SANITIZE_ENCODED);
+?&gt;
+&lt;form action=&quot;index.php&quot; method=&quot;get&quot;&gt;
+  &lt;div&gt;
+    &lt;label for=&quot;search&quot;&gt;Search:&lt;/label&gt;
+    &lt;input type=&quot;text&quot; name=&quot;s&quot; id=&quot;search&quot; 
+           value=&quot;&lt;?php echo $search_html;?&gt;&quot;&gt;
+   &lt;input type=&quot;hidden&quot; name=&quot;demo&quot; value=&quot;17&quot;&gt;
+   &lt;input type=&quot;submit&quot; value=&quot;Make it so&quot;&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+&lt;?php
+if(isset($_GET[&#x27;s&#x27;])){
+  echo &#x27;&lt;h2&gt;You searched for &#x27;.$search_html.&#x27;&lt;/h2&gt;&#x27;;
+  $yql = &#x27;select * from search.web where query=&quot;&#x27;.$search_url.&#x27;&quot;&#x27;;
+  $url = &#x27;http://query.yahooapis.com/v1/public/yql?q=&#x27;.
+          urlencode($yql).&#x27;&amp;format=json&amp;diagnostics=false&#x27;;
+  $ch = curl_init(); 
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  $output = curl_exec($ch); 
+  curl_close($ch);
+  $data = json_decode($output);
+  echo &#x27;&lt;ul&gt;&#x27;;
+  foreach ($data-&gt;query-&gt;results-&gt;result as $r){
+    echo &#x27;&lt;li&gt;&lt;h3&gt;&lt;a href=&quot;&#x27;.$r-&gt;clickurl.&#x27;&quot;&gt;&#x27;.$r-&gt;title.&#x27;&lt;/a&gt;&lt;/h3&gt;&#x27;.
+         &#x27;&lt;p&gt;&#x27;.$r-&gt;abstract.&#x27; &lt;span&gt;(&#x27;.$r-&gt;dispurl.&#x27;)&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&#x27;;
+  }
+  echo &#x27;&lt;/ul&gt;&#x27;;
+
+  echo &#x27;&lt;p&gt;&lt;a href=&quot;index.php?search=&#x27;.$search_url.&#x27;&amp;demo=17&quot;&gt;Search again.&lt;/a&gt;&lt;/p&gt;&#x27;;
+}
+?&gt;</code></pre> 
+
+<h2>Interaction with JavaScript</h2>
+
+<p>One thing that people keep asking about is to send information from PHP and JavaScript and back. This is done in a few ways.</p>
+<ul>
+  <li>If you want to send information from JavaScript to PHP you need to either alter the <code>href</code> of a link or populate a hidden form field. The other solution of course is to use Ajax.</li>
+  <li>If you want to send information from PHP to JavaScript simply render a script element and write out the PHP information with an <code>echo</code> statement.</li>
+  <li>Using PHP's <code>header()</code> function and <code>json_encode()</code> you can send data back to the browser as JavaScript and thus make it possible to use it as a <code>src</code> attribute of a <code>script</code> node.</li>
+</ul>
+
+<p>So for example when you want to have the smashing magazine RSS feed as a JavaScript object, <a href="http://icant.co.uk/articles/phpforhacks/index.php?demo=18">you can do the following</a>:</p>
+
+<pre><code>&lt;?php
+  header(&#x27;Content-type: text/javascript&#x27;);
+  $url = &#x27;http://rss1.smashingmagazine.com/feed/&#x27;;
+  $ch = curl_init(); 
+  curl_setopt($ch, CURLOPT_URL, $url); 
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+  $output = curl_exec($ch); 
+  curl_close($ch);
+  $data = simplexml_load_string($output);
+  $data = json_encode($data);
+  echo &#x27;var smashingrss=&#x27;.$data;
+?&gt;</code></pre>
+
+<p>You could then use this in a JavaScript block:</p>
+
+<pre><code>&lt;script src=&quot;http://icant.co.uk/articles/phpforhacks/index.php?demo=18&quot;&gt;&lt;/script&gt;
+&lt;script&gt;alert(smashingrss.title);&lt;/script&gt;</code></pre>
+
+<p>Using <code>header()</code> and <code>json_encode()</code> you could do any complex conversion and filtering in PHP and re-use it in JavaScript.</p>
+
+<h2>Summary</h2>
+
+<p>I hope this gave you an idea of what PHP is and how you can use it to use web services and build your own APIs to re-use in JavaScript. Using PHP for the web boils down to a few tricks:</p>
+
+<ul>
+  <li>Use cURL to load data from web resources</li>
+  <li>Convert information with <code>simplexml_load_string()</code> and <code>json_decode()</code></li>
+  <li>Check the structure of returned information with <code>print_r()</code></li>
+  <li>Loop over information with <code>foreach()</code></li>
+  <li>Use the <code>$_GET[]</code> and <code>$_POST[]</code> arrays to re-use form data and URL parameters</li>
+  <li>Filter information from the user and URLs using the inbuilt PHP filter methods</li>
+</ul>
+
+<p>There is a lot of documentation out there, and your best bet is to go directly to the <a href="http://php.net">PHP homepage</a> and read/download the docs. You should especially check the user-added comments as this is where the real gems ands implementation examples are listed.</p> 
+
+  </div>
+  <div id="ft" role="contentinfo">
+    <p>Part of the Hackday Toolbox</p>
+  </div>
+
+</div>
+</body>
+</html>

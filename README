@@ -1,0 +1,12 @@
+A collection of common code tasks needed to build a hack for an open 
+hack day. 
+
+Contains information about how to use PHP to read web services, using YQL 
+to remix web data, using YQL to make it simple to display data and a library
+to get geographical information about content and the end users.
+
+Also includes oAuth authentication examples with the Yahoo library to access
+the Yahoo social Firehose.
+
+See it in action at http://isithackday.com/hackday-toolbox
+
